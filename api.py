@@ -18,7 +18,7 @@ def get_course_id(course_code):
     ## check response
     course_list = r.json()
     for course in course_list:
-        if course["course_code"] == course_code:
+        if course["course_code"].lower() == course_code.lower():
             return course["id"]
     
     ## if course not found
