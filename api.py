@@ -20,6 +20,8 @@ def get_course_id(course_code):
     for course in course_list:
         if course["course_code"] == course_code:
             return course["id"]
+    
+    ## if course not found
     raise ValueError("Course not found")
 
 def list_all_folders(course_id):
