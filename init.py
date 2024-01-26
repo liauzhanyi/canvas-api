@@ -24,5 +24,5 @@ confirm = input(
 
 ## make directories
 for course in parser.courses:
-    os.makedirs(os.path.join(parser.path, course), exist_ok=True)
+    os.makedirs(os.path.join(parser.path, course.upper()), exist_ok=True)
   
