@@ -1,9 +1,11 @@
 import requests
 import os
 from dotenv import load_dotenv
+from utils import Cacher
 
 load_dotenv()
 API_HOST = os.getenv("API_HOST")
+cache = Cacher().load()
 
 def get_course_id(course_code):
     ## define params
