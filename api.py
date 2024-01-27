@@ -1,13 +1,21 @@
 import requests
 import os
 from dotenv import load_dotenv
-from utils import Cacher
+from utils import refresh_cache
 
 load_dotenv()
 API_HOST = os.getenv("API_HOST")
-cache = Cacher().load()
+cache = refresh_cache()
 
 def get_course_id(course_code):
+    key = f"{course_code}_id"
+    id = cache.read(key)
+    
+    if id:
+        return id
+    
+    ## if id not in cache, request from api
+    print("Course id not found in cache, requesting from api...")
     ## define params
     endpoint = "/courses"
     url = API_HOST + endpoint
@@ -21,9 +29,12 @@ def get_course_id(course_code):
     course_list = r.json()
     for course in course_list:
         if course["course_code"].lower() == course_code.lower():
-            return course["id"]
-    
-    ## if course not found
+            ## update cache
+            id = course["id"]
+            cache.update(key, id)
+            return id
+
+    ## if id not in cache or api == course not found, raise error
     raise ValueError("Course not found")
 
 def list_all_folders(course_id):
@@ -63,3 +74,5 @@ def list_files(course_id):
     file_list = r.json()
 
     return file_list
+
+cache.store()
