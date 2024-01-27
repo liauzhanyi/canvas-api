@@ -34,3 +34,22 @@ class Cacher:
         except FileNotFoundError:
             self.cache = {}
         return self
+    
+    def clear(self):
+        self.cache = {}
+        print("Cache cleared\n")
+        return self
+    
+    def log(self):
+        print("Cache contents:")
+        for key, value in self.cache.items():
+            print(f"{key} = {value}")
+        print("\n")
+        return self
+    
+def refresh_cache():
+    print("Refreshing cache...")
+    cache = Cacher().load()
+    cache.store()
+    print("Done\n")
+    return cache
