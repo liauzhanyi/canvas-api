@@ -15,7 +15,6 @@ argparser.add_argument("-p", "--path", type=str, required=False,
 ## read command line arguments
 parser = argparser.parse_args()
 
-
 confirm = input(
     "This will overwrite existing folders with the folowing names:\n" +
     "\n".join(parser.courses).upper() + "\n" +
@@ -25,4 +24,4 @@ confirm = input(
 ## make directories
 for course in parser.courses:
     os.makedirs(os.path.join(parser.path, course.upper()), exist_ok=True)
-  
+    os.makedirs(os.path.join(parser.path, "new-files"), exist_ok=True)
