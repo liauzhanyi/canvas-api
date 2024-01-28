@@ -3,7 +3,11 @@ import pickle
 from dotenv import load_dotenv
 
 load_dotenv()
-CACHE_FILENAME = os.getenv("CACHE_FILENAME")
+CACHE_LOCATION = os.path.join(
+    os.getenv("ROOT"),
+     ".cache/",
+    os.getenv("CACHE_FILENAME")
+)
 
 class Cacher:
     def __init__(self, cache={}):
@@ -23,7 +27,7 @@ class Cacher:
     
     def store(self):
         print("Writing cache to file...")
-        with open(CACHE_FILENAME, "wb") as f:
+        with open(CACHE_LOCATION, "wb") as f:
             pickle.dump(self.cache, f)
         print("Done\n")
         return self
@@ -31,7 +35,7 @@ class Cacher:
     def load(self):
         print("Loading cache from file...")
         try:
-            with open(CACHE_FILENAME, "rb") as f:
+            with open(CACHE_LOCATION, "rb") as f:
                 self.cache = pickle.load(f)
             print("Done\n")
         except FileNotFoundError:
