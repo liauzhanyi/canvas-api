@@ -1,6 +1,5 @@
 import argparse
-from utils import refresh_cache
-from api import download_course_files, cache
+from api import download_course_files
 
 ## define command line arguments
 argparser = argparse.ArgumentParser()

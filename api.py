@@ -9,6 +9,15 @@ load_dotenv()
 API_HOST = os.getenv("API_HOST")
 cache = refresh_cache()
 
+## handle api pagination
+def next_page(header):
+    links = dict(header)["Link"].split(",")
+    for link in links:
+        url, rel = link.split(";")
+        if "next" in rel[5:-1]:
+            return url[1:-1]
+    return None
+
 def get_course_id(course_code):
     key = f"{course_code}_id"
     id = cache.read(key)
@@ -58,6 +67,7 @@ def list_all_folders(course_id):
 
     return folder_list
 
+## TODO: handle pagination
 def list_files(course_id):
     ## define params
     endpoint = f"/courses/{course_id}/files"
