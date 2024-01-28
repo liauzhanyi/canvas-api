@@ -1,5 +1,8 @@
 import os
 import argparse
+from dotenv import load_dotenv
+
+load_dotenv()
 
 ## define command line arguments
 argparser = argparse.ArgumentParser()
@@ -24,4 +27,4 @@ confirm = input(
 ## make directories
 for course in parser.courses:
     os.makedirs(os.path.join(parser.path, course.upper()), exist_ok=True)
-    os.makedirs(os.path.join(parser.path, "new-files"), exist_ok=True)
+    os.makedirs(os.path.join(parser.path, os.getenv("NEW_FILES_FOLDER")), exist_ok=True)
