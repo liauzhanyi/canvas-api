@@ -1,6 +1,9 @@
+import os
 import pickle
+from dotenv import load_dotenv
 
-CACHE_FILENAME = "cache.pkl"
+load_dotenv()
+CACHE_FILENAME = os.getenv("CACHE_FILENAME")
 
 class Cacher:
     def __init__(self, cache={}):
@@ -51,5 +54,4 @@ def refresh_cache():
     print("Refreshing cache...")
     cache = Cacher().load()
     cache.store()
-    print("Done\n")
     return cache
