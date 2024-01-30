@@ -9,14 +9,26 @@ load_dotenv()
 API_HOST = os.getenv("API_HOST")
 cache = refresh_cache()
 
-## handle api pagination
-def next_page(header):
-    links = dict(header)["Link"].split(",")
-    for link in links:
-        url, rel = link.split(";")
-        if "next" in rel[5:-1]:
-            return url[1:-1]
-    return None
+def get_request(url, headers, params=None):
+    r = requests.get(url=url, headers=headers, params=params)
+    
+    ## check response
+    if r.status_code != 200:
+        raise Exception(f"Error {r.status_code}: {r.reason} initial request failed")
+    
+    response = r.json()
+    
+    ## handle api pagination
+    while "next" in r.links:
+        r = requests.get(url=r.links["next"]["url"], headers=headers, params=params)
+        
+        ## check response
+        if r.status_code != 200:
+            raise Exception(f"Error {r.status_code}: {r.reason} subsequent request failed")
+        
+        response.extend(r.json())
+    
+    return response
 
 def get_course_id(course_code):
     key = f"{course_code}_id"
@@ -32,12 +44,11 @@ def get_course_id(course_code):
     url = API_HOST + endpoint
     
     ## make https request
-    r = requests.get(url=url, 
+    course_list = get_request(url=url, 
                     headers={"Authorization": "Bearer " + os.getenv("API_TOKEN")},
                     params={"enrollment_state": "active"})
     
     ## check response
-    course_list = r.json()
     for course in course_list:
         if course["course_code"].lower() == course_code.lower():
             ## update cache
@@ -55,38 +66,24 @@ def list_all_folders(course_id):
     url = API_HOST + endpoint
     
     ## make https request
-    r = requests.get(url=url, 
+    folder_list = get_request(url=url, 
                     headers={"Authorization": "Bearer " + os.getenv("API_TOKEN")})
-    
-    ## check response
-    if r.status_code != 200:
-        raise Exception(f"Error {r.status_code}: {r.reason}")
-
-    ## parse response
-    folder_list = r.json()
 
     return folder_list
 
-## TODO: handle pagination
 def list_files(course_id):
     ## define params
     endpoint = f"/courses/{course_id}/files"
     url = API_HOST + endpoint
     
     ## make https request
-    r = requests.get(url=url, 
+    files = get_request(url=url, 
                     headers={"Authorization": "Bearer " + os.getenv("API_TOKEN")},
                     params={"sort" : "updated_at", 
-                            "order" : "desc"})
-    
-    ## check response
-    if r.status_code != 200:
-        raise Exception(f"Error {r.status_code}: {r.reason}")
-    
-    ## parse response
-    file_list = r.json()
+                            "order" : "desc",
+                            "per_page" : 50})
 
-    return file_list
+    return files
 
 def download_course_files(courses):
     last_update = cache.read("last_update")
